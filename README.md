@@ -28,3 +28,6 @@ user authentication:
 $ curl -X POST -F "image=@<path-to-image>" -F "userid=<userid>" http://0.0.0.0:8000/auth
 {'auth_status': true, 'upload_data': true, 'user_id': <userid>}  #returned json
 ```
+
+## Client examples: 
+- [Php POST with CUrl](https://stackoverflow.com/questions/3433542/curl-php-send-image)
