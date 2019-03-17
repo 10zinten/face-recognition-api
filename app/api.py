@@ -29,7 +29,7 @@ def register():
                 os.makedirs(user_dir)
             img = face_recognition.load_image_file(file_obj)
             encoding = face_recognition.face_encodings(img)[0]
-            np.save(os.path.join(user_dir, '{}_encoding.npz'.format(userid)), encoding)
+            np.save(os.path.join(user_dir, '{}_encoding'.format(userid)), encoding)
             response = {
                 'Satus': True
             }
