@@ -1,4 +1,5 @@
-import os
+from pathlib import Path
+
 from flask import Flask, request, Response
 import jsonpickle
 import face_recognition
@@ -17,19 +18,19 @@ def register():
     if request.method == "POST":
         file_obj = request.files['image']
         userid = request.form['userid']
-
+        
         # create dir with name userid in auth/ to store the face_encoding.
-        user_dir = os.path.join('auth', userid)
-        if os.listdir(user_dir):
+        user_dir = Path('auth') / userid
+        user_dir.mkdir(parents=True, exist_ok=True)
+        if len(list(user_dir.iterdir())):
             response = {
                 'Status': False
             }
         else:
-            if not os.path.exists(user_dir):
-                os.makedirs(user_dir)
+            # create encoding of the face image and store
             img = face_recognition.load_image_file(file_obj)
             encoding = face_recognition.face_encodings(img)[0]
-            np.save(os.path.join(user_dir, '{}_encoding'.format(userid)), encoding)
+            np.save(str(user_dir / '{}_encoding'.format(userid)), encoding)
             response = {
                 'Satus': True
             }
