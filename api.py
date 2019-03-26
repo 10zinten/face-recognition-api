@@ -41,8 +41,8 @@ def register():
 
 
 def is_authenticate(userid, file_obj):
-    user_dir = os.path.join('auth', userid)
-    src_encoding_fn = os.path.join(user_dir, '{}_encoding.npy'.format(userid))
+    user_dir = Path('auth') / userid
+    src_encoding_fn = str(user_dir / '{}_encoding.npy'.format(userid))
     src_encoding = np.load(src_encoding_fn)
 
     img = face_recognition.load_image_file(file_obj)
