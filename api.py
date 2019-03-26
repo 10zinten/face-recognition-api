@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from flask import Flask, request, Response
+from flask import Flask, request, Response, render_template
 import jsonpickle
 import face_recognition
 import numpy as np
@@ -8,9 +8,9 @@ import numpy as np
 app = Flask(__name__)
 
 @app.route("/")
-def home():
+def index():
     # add usage of API and possibly access key
-    pass
+    return render_template('index.html')
 
 
 @app.route("/register", methods=["POST"])
