@@ -5,8 +5,8 @@ This project is about Facial Recognition webservices through RestFul API that ha
 Linux Ubuntu 18.04 LTS
 ```
 $ git clone https://github.com/10zinten/face-recognition.git
-$ cd face-recognition
-$ virtualenv env -p python3.6$ 
+$ cd face-recognition-api
+$ virtualenv env -p python3.6
 $ source env/bin/activate
 $ pip install -r requirements.txt
 ```
@@ -14,21 +14,31 @@ $ pip install -r requirements.txt
 ## Usage
 Start the server
 ```
-$ cd app
-$ python api.py
+$ python run.py
 ```
 
 User registeration:
 ```
 $ curl -X POST -F "image=@<path-to-image>" -F "userid=<userid>" http://0.0.0.0:8000/register
-{'Status': true}  #returned json
+{
+  "type: "registration",
+  "Status": succeed/failed,
+  "userid": <userid>
+}
 ```
 
 user authentication:
 ```
 $ curl -X POST -F "image=@<path-to-image>" -F "userid=<userid>" http://0.0.0.0:8000/auth
-{'auth_status': true, 'upload_data': true, 'user_id': <userid>}  #returned json
+{
+  "type: "auth",
+  'status': succeed/failed, 
+  'data_received': succeed/failed, 
+  'user_id': <userid>
+}
 ```
 
 ## Client examples: 
-- [Php POST with CUrl](https://stackoverflow.com/questions/3433542/curl-php-send-image)
+- Php
+  - [Registration](https://github.com/10zinten/face-recognition-api/blob/master/examples/php/register.php)
+  - [Authentication](https://github.com/10zinten/face-recognition-api/blob/master/examples/php/auth.php)
