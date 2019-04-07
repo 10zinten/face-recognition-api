@@ -41,4 +41,8 @@ $ curl -X POST -F "image=@<path-to-image>" -F "userid=<userid>" http://0.0.0.0:8
 ## Client examples: 
 - Php
   - [Registration](https://github.com/10zinten/face-recognition-api/blob/master/examples/php/register.php)
+    ![registeration](https://github.com/10zinten/face-recognition-api/blob/master/examples/php/imgs/api_register.png)
+    
   - [Authentication](https://github.com/10zinten/face-recognition-api/blob/master/examples/php/auth.php)
+    ![authentication](https://github.com/10zinten/face-recognition-api/blob/master/examples/php/imgs/api_auth.png)
+    !
