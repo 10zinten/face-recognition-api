@@ -9,13 +9,12 @@ import numpy as np
 # TODO: project structring -> refer to corey package structure, flask series
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///user_encoding.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///user.db'
 db = SQLAlchemy(app)
 
 class UserEncoding(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(20), unique=True, nullable=False)
-    n_encodings = db.Column(db.Integer, nullable=False)
+    userid = db.Column(db.String(20), unique=True, nullable=False)
 
     def __repr__(self):
         return f"User('{self.username}': {self.n_encodings})"
@@ -36,21 +35,27 @@ def index():
 
 @app.route("/register", methods=["POST"])
 def register():
-    # TODO: user_embeddings dir structure -> ./embeddings/username/01_encoding.npy
     if request.method == "POST":
         file_obj = request.files['image']
         userid = request.form['userid']
-        
+ 
         # create dir with name userid in auth/ to store the face_encoding.
         user_dir = Path('./embeddings') / userid
         user_dir.mkdir(parents=True, exist_ok=True)
-        if len(list(user_dir.iterdir())):
+        
+        # check if userid already exists
+        if UserEncoding.query.filter_by(userid=userid).first():
             response = {
                 'type': REGISTRATION,
                 'userid': userid,
                 'status': FAILED
             }
         else:
+            # add user to database
+            user = UserEncoding(userid=userid)
+            db.session.add(user)
+            db.session.commit()
+            
             # create encoding of the face image and store
             img = face_recognition.load_image_file(file_obj)
             encoding = face_recognition.face_encodings(img)[0]
@@ -85,7 +90,7 @@ def authenticate():
         file_obj = request.files['image']
         userid = request.form['userid']
 
-        if file_obj and userid:
+        if file_obj and userid and UserEncoding.query.filter_by(userid=userid).first():
             response = {
                 'type': AUTH,
                 'data_received': SUCCEED,
