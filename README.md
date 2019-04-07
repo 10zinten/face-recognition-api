@@ -14,6 +14,7 @@ $ pip install -r requirements.txt
 ## Usage
 Start the server
 ```
+$ cd app
 $ python run.py
 ```
 
