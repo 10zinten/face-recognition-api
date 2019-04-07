@@ -1,4 +1,6 @@
 # face-recognition
+----------------------------------------------------------------------
+This project is about Facial Recognition webservices through RestFul API that has been developed under the SRM Institute of Science and Technology B.Tech 2015 curriculum as Major project for final semester, 2019.
 
 ## Installation
 Linux Ubuntu 18.04 LTS
