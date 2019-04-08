@@ -24,16 +24,25 @@ def index():
     return render_template('index.html')
 
 
+def create_embeddings(images, user_dir):
+    for i, image in enumerate(images):
+        img = face_recognition.load_image_file(image)
+        encoding = face_recognition.face_encodings(img)[0]
+        np.save(str(user_dir / '{}_embedding'.format(i+1)), encoding)
+
+
 @app.route("/register", methods=["POST"])
 def register():
     if request.method == "POST":
-        file_obj = request.files['image']
+        images = []
         userid = request.form['userid']
  
         # create dir with name userid in auth/ to store the face_encoding.
         user_dir = EMBEDDINGS_PATH / userid
         user_dir.mkdir(parents=True, exist_ok=True)
         
+        print(User.query.filter_by(userid=userid).first())
+
         # check if userid already exists
         if User.query.filter_by(userid=userid).first():
             response = {
@@ -46,33 +55,56 @@ def register():
             user = User(userid=userid)
             db.session.add(user)
             db.session.commit()
+
+            # get all the user's face images
+            images.append(request.files['image1'])
+            images.append(request.files['image2'])
+            images.append(request.files['image3'])
+            images.append(request.files['image4'])
+            images.append(request.files['image5'])
             
-            # create encoding of the face image and store
-            img = face_recognition.load_image_file(file_obj)
-            encoding = face_recognition.face_encodings(img)[0]
-            np.save(str(user_dir / '{}_encoding'.format(userid)), encoding)
-            response = {
-                'type': REGISTRATION,
-                'userid': userid,
-                'status': SUCCEED
-            }
-        
+
+            # create embeddings of the face image and store
+            try:
+                create_embeddings(images, user_dir)
+                response = {
+                    'type': REGISTRATION,
+                    'userid': userid,
+                    'status': SUCCEED
+                }
+            except:
+                response = {
+                    'type': REGISTRATION,
+                    'userid': userid,
+                    'status': FAILED
+                }
+
+    print(response)
     response_pickled = jsonpickle.encode(response)
 
     return Response(response_pickled, status =200, mimetype="application/json")
 
 
-def is_authenticate(userid, file_obj):
+def is_authenticate(userid, file_obj, thresh=4):
     user_dir = EMBEDDINGS_PATH / userid
-    src_encoding_fn = str(user_dir / '{}_encoding.npy'.format(userid))
-    src_encoding = np.load(src_encoding_fn)
-
     img = face_recognition.load_image_file(file_obj)
-    encoding = face_recognition.face_encodings(img)[0]
 
-    result = face_recognition.compare_faces([src_encoding], encoding)[0]
+    try:
+        encoding = face_recognition.face_encodings(img)[0]
+    except:
+        # No face detected, image without face
+        return False
 
-    return bool(result)
+    results = []
+    for i in range(5):
+        src_encoding_fn = str(user_dir / '{}_embedding.npy'.format(i+1))
+        src_encoding = np.load(src_encoding_fn)
+        result = face_recognition.compare_faces([src_encoding], encoding)[0]
+        results.append(bool(result))
+
+    results = np.array(results)
+    print(results)
+    return len(results[results == True]) >= thresh
 
 
 @app.route("/auth", methods=["POST"])
@@ -91,11 +123,12 @@ def authenticate():
         else:
             response = {
                 'type': AUTH,
-                'data_received': FALIED,
+                'data_received': FAILED,
                 'userid': userid,
                 'status': FAILED
             }
 
+        print(response)
         response_pickled = jsonpickle.encode(response)
 
         return Response(response_pickled, status =200, mimetype="application/json")
