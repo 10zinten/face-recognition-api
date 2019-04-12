@@ -22,9 +22,10 @@ User registeration:
 ```
 $ curl -X POST -F "image=@<path-to-image>" -F "userid=<userid>" http://0.0.0.0:8000/register
 {
-  "type: "registration",
+  "type": "registration",
   "Status": succeed/failed,
   "userid": <userid>
+  "face_detected": succeed/failed
 }
 ```
 
@@ -32,10 +33,11 @@ user authentication:
 ```
 $ curl -X POST -F "image=@<path-to-image>" -F "userid=<userid>" http://0.0.0.0:8000/auth
 {
-  "type: "auth",
-  'status': succeed/failed, 
-  'data_received': succeed/failed, 
-  'user_id': <userid>
+  "type": "auth",
+  "status": succeed/failed, 
+  "data_received": succeed/failed, 
+  "user_id": <userid>
+  "face_detected": succeed/failed
 }
 ```
 
