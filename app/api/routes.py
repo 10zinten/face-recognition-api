@@ -41,8 +41,6 @@ def register():
         user_dir = EMBEDDINGS_PATH / userid
         user_dir.mkdir(parents=True, exist_ok=True)
         
-        print(User.query.filter_by(userid=userid).first())
-
         # check if userid already exists
         if User.query.filter_by(userid=userid).first():
             response = {
@@ -53,8 +51,6 @@ def register():
         else:
             # add user to database
             user = User(userid=userid)
-            db.session.add(user)
-            db.session.commit()
 
             # get all the user's face images
             images.append(request.files['image1'])
@@ -70,13 +66,17 @@ def register():
                 response = {
                     'type': REGISTRATION,
                     'userid': userid,
-                    'status': SUCCEED
+                    'status': SUCCEED,
+                    'face_detected': SUCCEED
                 }
-            except:
+                db.session.add(user)
+                db.session.commit()
+            except IndexError:
                 response = {
                     'type': REGISTRATION,
                     'userid': userid,
-                    'status': FAILED
+                    'status': FAILED,
+                    'face_detected': FAILED
                 }
 
     print(response)
@@ -88,12 +88,7 @@ def register():
 def is_authenticate(userid, file_obj, thresh=4):
     user_dir = EMBEDDINGS_PATH / userid
     img = face_recognition.load_image_file(file_obj)
-
-    try:
-        encoding = face_recognition.face_encodings(img)[0]
-    except:
-        # No face detected, image without face
-        return False
+    encoding = face_recognition.face_encodings(img)[0]
 
     results = []
     for i in range(5):
@@ -114,12 +109,32 @@ def authenticate():
         userid = request.form['userid']
 
         if file_obj and userid and User.query.filter_by(userid=userid).first():
-            response = {
-                'type': AUTH,
-                'data_received': SUCCEED,
-                'userid': userid,
-                'status': SUCCEED if is_authenticate(userid, file_obj) else FALIED
-            }
+            try:
+                if is_authenticate(userid, file_obj):
+                    response = {
+                        'type': AUTH,
+                        'data_received': SUCCEED,
+                        'userid': userid,
+                        'status': SUCCEED,
+                        'face_detected': SUCCEED
+                    }
+                else:
+                    response = {
+                        'type': AUTH,
+                        'data_received': SUCCEED,
+                        'userid': userid,
+                        'status': FAILED,
+                        'face_detected': SUCCEED
+                    }
+            except IndexError:
+                # face not detected
+                response = {
+                    'type': AUTH,
+                    'data_received': SUCCEED,
+                    'userid': userid,
+                    'status': FAILED,
+                    'face_detected': FAILED
+                }
         else:
             response = {
                 'type': AUTH,
