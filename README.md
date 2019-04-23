@@ -20,10 +20,11 @@ $ python run.py
 
 User registeration:
 ```
-$ curl -X POST -F "image=@<path-to-image>" -F "userid=<userid>" http://0.0.0.0:8000/register
+$ curl -X POST -F "image1=@test.jpeg"  -F "image2=@test.jpeg"  -F "image3=@test.jpeg"  -F "image4=@test.jpeg"  -F "image5=@test.jpeg"  -F "userid=<userid>" http://0.0.0.0:5000/register
+
 {
   "type": "registration",
-  "Status": succeed/failed,
+  "status": succeed/failed,
   "userid": <userid>
   "face_detected": succeed/failed
 }
@@ -32,6 +33,7 @@ $ curl -X POST -F "image=@<path-to-image>" -F "userid=<userid>" http://0.0.0.0:8
 user authentication:
 ```
 $ curl -X POST -F "image=@<path-to-image>" -F "userid=<userid>" http://0.0.0.0:8000/auth
+
 {
   "type": "auth",
   "status": succeed/failed, 
